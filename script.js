@@ -1,4 +1,50 @@
 document.addEventListener("DOMContentLoaded", function () {
+  const currentUserRaw = localStorage.getItem("focusOnTodayCurrentUser");
+  if (!currentUserRaw) {
+    window.location.href = "signin.html";
+    return;
+  }
+
+  let currentUser;
+  try {
+    currentUser = JSON.parse(currentUserRaw);
+  } catch (error) {
+    localStorage.removeItem("focusOnTodayCurrentUser");
+    window.location.href = "signin.html";
+    return;
+  }
+
+  const welcomeText = document.getElementById("welcomeText");
+  const sessionText = document.getElementById("sessionText");
+
+  function formatDateTime(value) {
+    if (!value) return "-";
+    return new Date(value).toLocaleString();
+  }
+
+  if (welcomeText) {
+    const displayName = currentUser.name || "User";
+    welcomeText.textContent = "Welcome, " + displayName;
+  }
+
+  if (sessionText) {
+    const loggedInAt = currentUser.loggedInAt
+      ? "Session started: " + formatDateTime(currentUser.loggedInAt)
+      : "Session started: Now";
+    const lastLogin = currentUser.lastLoginAt
+      ? "Last login: " + formatDateTime(currentUser.lastLoginAt)
+      : "Last login: First login";
+    sessionText.textContent = loggedInAt + " | " + lastLogin;
+  }
+
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", function () {
+      localStorage.removeItem("focusOnTodayCurrentUser");
+      window.location.href = "signin.html";
+    });
+  }
+
   //Accessing the DOM elements for the goals and checkboxes
   const goalOne = document.querySelector(".goal-one");
   const goalTwo = document.querySelector(".goal-two");
